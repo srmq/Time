@@ -11,12 +11,16 @@
 
 #if defined(__AVR__)
 #include <avr/pgmspace.h>
+#define pgm_read_pointer(addr) pgm_read_word(addr)
+#elif defined(ESP8266)
+#include <pgmspace.h>
+#define pgm_read_pointer(addr) pgm_read_dword(addr)
 #else
 // for compatiblity with Arduino Due and Teensy 3.0 and maybe others?
 #define PROGMEM
 #define PGM_P  const char *
 #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
-#define pgm_read_word(addr) (*(const unsigned char **)(addr))
+#define pgm_read_pointer(addr) (*(const unsigned char **)(addr))
 #define strcpy_P(dest, src) strcpy((dest), (src))
 #endif
 #include <string.h> // for strcpy_P or strcpy
@@ -41,7 +45,7 @@ const char monthStr10[] PROGMEM = "October";
 const char monthStr11[] PROGMEM = "November";
 const char monthStr12[] PROGMEM = "December";
 
-const PROGMEM char * const PROGMEM monthNames_P[] =
+const char * const monthNames_P[] PROGMEM =
 {
     monthStr0,monthStr1,monthStr2,monthStr3,monthStr4,monthStr5,monthStr6,
     monthStr7,monthStr8,monthStr9,monthStr10,monthStr11,monthStr12
@@ -58,7 +62,7 @@ const char dayStr5[] PROGMEM = "Thursday";
 const char dayStr6[] PROGMEM = "Friday";
 const char dayStr7[] PROGMEM = "Saturday";
 
-const PROGMEM char * const PROGMEM dayNames_P[] =
+const char * const dayNames_P[] PROGMEM =
 {
    dayStr0,dayStr1,dayStr2,dayStr3,dayStr4,dayStr5,dayStr6,dayStr7
 };
@@ -69,7 +73,7 @@ const char dayShortNames_P[] PROGMEM = "ErrSunMonTueWedThuFriSat";
 
 char* monthStr(uint8_t month)
 {
-    strcpy_P(buffer, (PGM_P)pgm_read_word(&(monthNames_P[month])));
+    strcpy_P(buffer, (PGM_P)pgm_read_pointer(&(monthNames_P[month])));
     return buffer;
 }
 
@@ -83,7 +87,7 @@ char* monthShortStr(uint8_t month)
 
 char* dayStr(uint8_t day) 
 {
-   strcpy_P(buffer, (PGM_P)pgm_read_word(&(dayNames_P[day])));
+   strcpy_P(buffer, (PGM_P)pgm_read_pointer(&(dayNames_P[day])));
    return buffer;
 }
 
